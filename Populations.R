@@ -35,8 +35,8 @@ for (t in 2:(n_steps+1)){
   proposed_y <- rnorm(1, mean=HR_center$y[i], sd=HR_sd[i])
   
   #Compute distance
-  dx <- proposed_x - positions[i,1,t-1]
-  dy <- proposed_y - positions[i,2,t-1]
+  dx <- proposed_x - locations[i,1,t-1]
+  dy <- proposed_y - locations[i,2,t-1]
   step_distance <- sqrt(dx^2 + dy^2)
   
   #If too far, move to max distance
@@ -45,12 +45,12 @@ for (t in 2:(n_steps+1)){
   dy[over_limit] <- dy[over_limit]/step_distance[over_limit]*max_speed
   
   #Define new positions
-  positions[i,1,t] <- positions[i,1,t-1]+dx
-  positions[i,2,t] <- positions[i,2,t-1]+dy
+  locations[i,1,t] <- locations[i,1,t-1]+dx
+  locations[i,2,t] <- locations[i,2,t-1]+dy
 
   #Keep within bounds
-  positions[i,1,t] <- pmax(0,pmin(space_size, positions[i,1,t]))
-  positions[i,2,t] <- pmax(0,pmin(space_size, positions[i,2,t])) 
+  locations[i,1,t] <- pmax(0,pmin(space_size, locations[i,1,t]))
+  locations[i,2,t] <- pmax(0,pmin(space_size, locations[i,2,t])) 
 
   }
   }
