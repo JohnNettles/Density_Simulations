@@ -6,7 +6,7 @@ set.seed(14)
 n_individ <- 10         #Population size
 n_steps <- 100          #Number of time steps
 space_size <- 100       #Size of 2D region
-max_speed <- 10          #Max speed
+max_speed <- 10          #Max speed in m/minute
 HR_sd_max <- 20         #Maximum home range sd
 HR_sd_min <- 5          #Minimum home range sd
 
