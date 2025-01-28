@@ -142,7 +142,7 @@ movement_data <- data.frame(
   y = as.vector(locations[, 2, ])
 )
 
-ggplot(movement_data[movement_data$ID <= 3, ], aes(x = x, y = y, color = factor(ID))) +
+ggplot(movement_data[movement_data$ID <= 5, ], aes(x = x, y = y, color = factor(ID))) +
   geom_path() +
   geom_point() +
   labs(title = "Movement of Individuals in 2D Space", x = "X Position", y = "Y Position") +
