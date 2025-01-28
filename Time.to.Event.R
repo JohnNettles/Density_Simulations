@@ -1,32 +1,41 @@
-
+library(msm)
+library(MASS)
 
 # Sampling details
 n_cams <- 15
-n_occ <- 20
+n_occ <- 13 # (number of sampling occasions)
 censor <- 4 # K (number of sampling periods per occasion)
 mvmt_speed <- 60 #Time it takes individual to cross the entire field of view (in minutes)
 
+# Four sampling periods per sampling occasion with a break of 4 hours in between
+# Each sequence goes from 1 to the total number of time steps included in simulations
 sampled_times <- sort(c(seq(1,n_steps,8),seq(2,n_steps,8),seq(3,n_steps,8),seq(4,n_steps,8)))
-#Will need to trim the capture history to just include the sampled times rather than all time.
+
+#Use just the sampled times
+sample <- captures[,c(sampled_times)]
+
+#Create an empty results matrix
+data <- matrix(NA,nrow=n_cams,ncol=n_occ)
+
+#Loop over cameras and sampling occasions
+for(b in 1:n_cams) {
+  for(i in 1:n_occ){
+    first_period <- (4*i)-3 #First column to use
+    last_period <- (4*i) #Last column to use
+    
+    sub_sample <- sample[b,first_period:last_period,drop=F] #Keep only the sampling periods that fall within this occasion
+    TTE <- match(TRUE, sub_sample == 1) #Count the number of columns until a 1 (capture)
+    
+    data[b,i] <- TTE
+  }
+}
 
 
-
-
-
-# Example dataset
-
-#would need to define number of occasions and number of sampling periods
-#If individual is inside a, then it would be a 1, otherwise would be a 0
-
-
-dat.tte <- list(toevent = matrix(c(NA, NA, 1, NA, NA, NA, NA, 4, NA, 2, 1, NA, 
-                                   NA, NA, NA, NA, NA, 3, NA, 2), ncol = nocc),
-                censor = censor,
-                A = A,
-                mean_a = a)
-dat.tte
-
-
+#Store data as a list to input into TTE function
+data.list <- list(toevent = matrix(data, ncol=nocc),
+             censor = censor,
+             A=A,
+             mean_a=a)
 
 
 # Exponential log likelihood
@@ -36,23 +45,24 @@ exp.logl.fn <- function(data, param){
   logL <- 0
   for(i in 1:nrow(data$toevent)) {
     for (j in 1:ncol(data$toevent)) {
-      if(!is.na(data$toevent[i, j])) {
-        tmp <- dexp(data$toevent[i, j], lambda)
+      if(!is.na(data$toevent[i, j])) {  #If the value is not NA (meaning there was a detection)
+        tmp <- dexp(data$toevent[i, j], lambda) #Probability density function for the time to event
       } else {
-        tmp <- pexp(data$censor, lambda, lower.tail = F)
+        tmp <- pexp(data$censor, lambda, lower.tail = F) #Cumulative density for greater than our censor
       }
-      logL <- logL + log(tmp)
+      logL <- logL + log(tmp) #Calculates log likelihood (including right-censored data) by summing all values of log(p(x))
     }
   }
   return(logL)
 }
 
+
 # Estimate abundance with Time-to-Event
 TTE.estN.fn <- function(data){
-  opt <- optim(log(1/mean(data$toevent, na.rm = T)), 
-               exp.logl.fn, 
+  opt <- optim(par=log(1/mean(data$toevent, na.rm = T)), #initial value is given by 1/sample mean
+               fn=exp.logl.fn, #Maximizing for our log likelihood function
                data = data, 
-               control = list(fnscale = -1),
+               control = list(fnscale = -1), #Turns it into a maximization problem
                hessian = T)
   # Estimate of lambda
   estlam <- exp(opt$par)
@@ -64,7 +74,7 @@ TTE.estN.fn <- function(data){
   # Variance with msm::deltamethod
   varB <- -ginv(opt$hessian)
   form <- sprintf("~ %f * exp(x1)", P)
-  SE_N <- deltamethod(g = as.formula(form), mean = opt$par, cov = varB, ses = T)
+  SE_N <- msm::deltamethod(g = as.formula(form), mean = opt$par, cov = varB, ses = T)
   
   return(list(estN = estN,
               SE_N = SE_N,
@@ -72,14 +82,5 @@ TTE.estN.fn <- function(data){
               UCI  = estN + SE_N * 1.96) )
 }
 
-TTE.estN.fn(dat.tte)
-
-## Space-to-Event
-# Space to event on each occasion (columns)
-ncam <- 8
-nocc <- 12
-dat.ste <- list(toevent = matrix(c(NA, NA, 1, NA, NA, NA, NA, 4, NA, 8, 1, NA) * a, 
-                                 ncol = nocc),
-                censor = ncam * a,
-                A = A)
-dat.ste
+#Calculate estimated N
+TTE.estN.fn(data.list)
