@@ -45,8 +45,8 @@ a <- pi * r^2 * theta/360 # Area of a single camera in square meters
 A <- sa.width*sa.length # area of study area in square meters
 
 # Sector arc details
-theta_start <- 0*(pi/180) #Start all angles at 0, convert to radians
-theta_end <- theta*(pi/180) #End the angles at theta, convert to radians
+theta_start <- (90-0.5*theta)*(pi/180) #Center all sectors at 90 degrees, convert to radians
+theta_end <- (90+0.5*theta)*(pi/180) #Center all sectors at 90 degrees, convert to radians
 n_points <- 100 #Number of points used to create arc
 
 
@@ -86,12 +86,11 @@ sectors_polygons <- lapply(sectors_params, function(params) {
 }) 
 
 
-#Create matrix to store capture history
-captures <- matrix(NA,nrow=n_cams,ncol=n_steps)
-
-
 
 # Create capture histories ------------------------------------------------
+
+#Create matrix to store capture history
+captures <- matrix(NA,nrow=n_cams,ncol=n_steps)
 
 #For each camera, create a matrix with the coordinates of the polygon
 for(i in 1:n_cams) {
