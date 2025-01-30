@@ -25,13 +25,15 @@ data <- rep(NA,n_occ_ste)
   for(i in 1:n_occ_ste){
       
       sub_sample <- sample[,i]  
-      STE <- match(TRUE, sub_sample == 1) #Count the number of rows until a 1 (capture)
+      STE <- match(TRUE, sub_sample >= 1) #Count the number of rows until at least one capture
     
     data[i] <- STE
   }
 
 
-data <- list(toevent=matrix(data*a), ncol = n_occ_ste, censor=n_cams*a, A=A)
+data <- list(toevent=matrix(data*a, ncol = n_occ_ste),
+            censor=n_cams*a, 
+            A=A)
 
 
 

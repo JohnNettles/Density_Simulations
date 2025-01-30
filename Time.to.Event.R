@@ -25,7 +25,7 @@ for(b in 1:n_cams) {
     last_period <- (4*i) #Last column to use
     
     sub_sample <- sample[b,first_period:last_period,drop=F] #Keep only the sampling periods that fall within this occasion
-    TTE <- match(TRUE, sub_sample == 1) #Count the number of columns until a 1 (capture)
+    TTE <- match(TRUE, sub_sample >= 1) #Count the number of columns until a 1 (capture)
     
     data[b,i] <- TTE
   }

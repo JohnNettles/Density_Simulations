@@ -4,11 +4,11 @@ set.seed(14)
 # Sample from home range --------------------------------------------------
 
 n_individ <- 10         #Population size
-n_steps <- 100          #Number of time steps
-space_size <- 100       #Size of 2D region
+n_steps <- 10000          #Number of time steps
+space_size <- 1000       #Size of 2D region
 max_speed <- 10          #Max speed in m/minute
-HR_sd_max <- 20         #Maximum home range sd
-HR_sd_min <- 5          #Minimum home range sd
+HR_sd_max <- 100         #Maximum home range sd
+HR_sd_min <- 20          #Minimum home range sd
 
 
 #Uniform distribution to sample standard deviation (home range size)
@@ -61,8 +61,8 @@ for (t in 2:(n_steps+1)){
 library(circular)
 
 n_individ <- 10               #Population size
-n_steps <- 1000                #Number of time steps
-space_size <- 100             #Size of 2D region
+n_steps <- 10000                #Number of time steps
+space_size <- 1000             #Size of 2D region
 max_speed <- 4               #Max speed
 cor.angle <- 0.6              #Correlation between successive angles
 cor.speed <- 0.4              #Correlation between successive speeds

@@ -18,7 +18,7 @@ coords <- data.frame(x,y)
 points_sf <- st_as_sf(coords,coords=c('x','y'))
 
 #Set the number of cameras (sampling points)
-n_cams <- 15
+n_cams <- 25
 
 #Conduct GRTS sample
 grts_sample <- grts(points_sf, n_base = n_cams, stratum_var = NULL, seltype = 'equal',projcrs_check = F)
@@ -102,11 +102,14 @@ for(i in 1:n_cams) {
     #This produces a vector of 0's and 1's, one value for each individual
     c.z <- point.in.polygon(locations[,1,z],locations[,2,z],points[,1],points[,2])
     
-    #To create our unmarked capture history: If there is at least one individual detected
-    #during that occasion, then that cell is marked as a 1. 
-    #So a 1 in row 4, column 12 means that the animal was detected at camera 4 during time step 12
-    captures[i,z] <- ifelse(sum(c.z) >= 1,1,0)
+    #To create our unmarked capture history: Count the number of detections at each camera during that occasion
+    #So a 3 in row 4, column 12 means that 3 animals were detected at camera 4 during time step 12
+    captures[i,z] <- ifelse(sum(c.z) >= 1,sum(c.z),0)
     
   }
 }
+
+
+
+
 
