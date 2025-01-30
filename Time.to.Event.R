@@ -2,13 +2,14 @@ library(msm)
 library(MASS)
 
 # Sampling details
-n_cams <- 15
-n_occ <- 13 # (number of sampling occasions)
+n_cams <- n_cams
 censor <- 4 # K (number of sampling periods per occasion)
-mvmt_speed <- 60 #Time it takes individual to cross the entire field of view (in minutes)
+n_occ_tte <- n_steps/censor # (number of sampling occasions)
+mvmt_speed <- 20 #Time it takes individual to cross the entire field of view (in minutes)
 
 # Four sampling periods per sampling occasion with a break of 4 hours in between
 # Each sequence goes from 1 to the total number of time steps included in simulations
+# Assumes animal is constantly available for capture
 sampled_times <- sort(c(seq(1,n_steps,8),seq(2,n_steps,8),seq(3,n_steps,8),seq(4,n_steps,8)))
 
 #Use just the sampled times
