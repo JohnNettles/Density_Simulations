@@ -1,5 +1,6 @@
 library(spsurvey)
 library(sf)
+library(sp)
 
 
 # GRTS sampling -----------------------------------------------------------
@@ -108,8 +109,3 @@ for(i in 1:n_cams) {
     
   }
 }
-
-
-
-
-
