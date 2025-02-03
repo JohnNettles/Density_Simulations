@@ -1,7 +1,9 @@
 library(msm)
 library(MASS)
 
-# Sampling details
+
+# Sampling details --------------------------------------------------------
+
 n_cams <- n_cams
 censor <- 4 # K (number of sampling periods per occasion)
 mvmt_speed <- 50 #Time it takes individual to cross the entire field of view (in minutes)
@@ -28,6 +30,10 @@ sample <- captures[,c(sampled_times)]
 #Create an empty results matrix
 data <- matrix(NA,nrow=n_cams,ncol=n_occ_tte)
 
+
+
+# Format data -------------------------------------------------------------
+
 #Loop over cameras and sampling occasions
 for(b in 1:n_cams) {
   for(i in 1:n_occ_tte){
@@ -48,6 +54,9 @@ data.list <- list(toevent = matrix(data, ncol=n_occ_tte),
              A=A,
              mean_a=a)
 
+
+
+# TTE functions -----------------------------------------------------------
 
 # Exponential log likelihood
 exp.logl.fn <- function(data, param){

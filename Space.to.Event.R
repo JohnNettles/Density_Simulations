@@ -1,14 +1,17 @@
+
+# Define variables --------------------------------------------------------
+
 # Space to event on each occasion (columns)
 n_cams <- n_cams
 sampled_minute <- trunc(runif(1,0,60))
 sample_order <- sample(c(1:n_cams),n_cams,replace=F) #randomly order the cameras
 
-
-
 # Sample for one minute each hour, starting with a random value, length = n_occ
 # Assumes animal is constantly available for capture
 sampled_times <- seq(sampled_minute,n_steps,by=60)
 n_occ_ste <- length(sampled_times)
+
+# Format data -------------------------------------------------------------
 
 #Use just the sampled times
 sample <- data.frame(captures[,c(sampled_times)])
@@ -36,6 +39,8 @@ data <- list(toevent=matrix(data*a, ncol = n_occ_ste),
             A=A)
 
 
+
+# STE functions -----------------------------------------------------------
 
 # Estimate abundance from STE
 STE.estN.fn <- function(data){

@@ -1,3 +1,6 @@
+
+# Define variables --------------------------------------------------------
+
 P <- A/a # Number of possible cameras (grid cells) in study area
 
 # Count of animals at each location (rows) and occasion (columns)
@@ -6,12 +9,19 @@ sampled_times <- seq(60,n_steps,by=60)
 n_occ_is <- length(sampled_times)
 
 
+
+# Format data -------------------------------------------------------------
+
 data <- captures[,sampled_times]
 
 data.list <- list(count = matrix(sample, ncol = n_occ_is),
                 ncam = n_cams,
                 nocc = n_occ_is )
 
+
+
+
+# IS functions ------------------------------------------------------------
 
 # Estimate abundance
 IS.fn <- function(data, P) {

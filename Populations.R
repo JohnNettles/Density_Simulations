@@ -4,11 +4,12 @@ set.seed(14)
 # Sample from home range --------------------------------------------------
 
 n_individ <- 10         #Population size
-n_steps <- 10000          #Number of time steps
-space_size <- 1000       #Size of 2D region
-max_speed <- 10          #Max speed in m/minute
-HR_sd_max <- 100         #Maximum home range sd
-HR_sd_min <- 20          #Minimum home range sd
+n_steps <- 10000        #Number of time steps
+space_size <- 1000      #Size of 2D region
+max_speed <- 10         #Max speed in m/minute
+HR_sd_max <- 100        #Maximum home range sd
+HR_sd_min <- 20         #Minimum home range sd
+mvmt_speed <- 50        #Time it takes individual to cross the entire field of view (in minutes)
 
 
 #Uniform distribution to sample standard deviation (home range size)
@@ -61,12 +62,13 @@ for (t in 2:(n_steps+1)){
 library(circular)
 
 n_individ <- 10               #Population size
-n_steps <- 10000                #Number of time steps
-space_size <- 1000             #Size of 2D region
-max_speed <- 4               #Max speed
-cor.angle <- 0.6              #Correlation between successive angles
-cor.speed <- 0.4              #Correlation between successive speeds
+n_steps <- 100000             #Number of time steps
+space_size <- 1000            #Size of 2D region
+max_speed <- 20                #Max speed
+cor.angle <- 0.4              #Correlation between successive angles
+cor.speed <- 0.8              #Correlation between successive speeds
 acceleration_strength <- 0.2  #Strength of acceleration towards center
+mvmt_speed <- 50              #Time it takes individual to cross the entire field of view (in minutes)
 
 
 #Sample home range centers for each individual
@@ -130,8 +132,8 @@ angles[i] <- mean_angle
 
 
 
-#################################################################################################
-#Plot results
+
+# Plot results ------------------------------------------------------------
 
 library(ggplot2)
 
