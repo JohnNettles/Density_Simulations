@@ -4,25 +4,35 @@ library(MASS)
 # Sampling details
 n_cams <- n_cams
 censor <- 4 # K (number of sampling periods per occasion)
-n_occ_tte <- n_steps/censor # (number of sampling occasions)
-mvmt_speed <- 20 #Time it takes individual to cross the entire field of view (in minutes)
+mvmt_speed <- 50 #Time it takes individual to cross the entire field of view (in minutes)
+occ_length <- censor * mvmt_speed # (length of each sampling occasion in minutes)
+n_occ_tte <- 0.5 * n_steps/occ_length # (number of sampling occasions (using only every other potential sampling period))
 
-# Four sampling periods per sampling occasion with a break of 4 hours in between
-# Each sequence goes from 1 to the total number of time steps included in simulations
+# sample every other potential occasion. Each occasion includes a number of sampling periods equal to 'censor'
+# sampling period length is determined by the amount of time it takes an animal to cross the widest part of the FOV
 # Assumes animal is constantly available for capture
-sampled_times <- sort(c(seq(1,n_steps,8),seq(2,n_steps,8),seq(3,n_steps,8),seq(4,n_steps,8)))
+sampled_times <- vector()
+
+for (i in 1:n_occ_tte) {
+  
+  start <- 1 + occ_length*2*(i-1)
+  end <- start + (mvmt_speed * censor)
+  x <- seq(from=start, to=end)
+  sampled_times <- c(st,x)
+  
+}
 
 #Use just the sampled times
 sample <- captures[,c(sampled_times)]
 
 #Create an empty results matrix
-data <- matrix(NA,nrow=n_cams,ncol=n_occ)
+data <- matrix(NA,nrow=n_cams,ncol=n_occ_tte)
 
 #Loop over cameras and sampling occasions
 for(b in 1:n_cams) {
-  for(i in 1:n_occ){
-    first_period <- (4*i)-3 #First column to use
-    last_period <- (4*i) #Last column to use
+  for(i in 1:n_occ_tte){
+    first_period <- (censor*i)-(censor-1) #First column to use
+    last_period <- (censor*i) #Last column to use
     
     sub_sample <- sample[b,first_period:last_period,drop=F] #Keep only the sampling periods that fall within this occasion
     TTE <- match(TRUE, sub_sample >= 1) #Count the number of columns until a 1 (capture)
@@ -33,7 +43,7 @@ for(b in 1:n_cams) {
 
 
 #Store data as a list to input into TTE function
-data.list <- list(toevent = matrix(data, ncol=nocc),
+data.list <- list(toevent = matrix(data, ncol=n_occ_tte),
              censor = censor,
              A=A,
              mean_a=a)
