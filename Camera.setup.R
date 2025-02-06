@@ -40,28 +40,33 @@ points(x=cameras$X,y=cameras$Y,col='red',pch=16, cex=0.5)
 # Camera Viewsheds --------------------------------------------------------
 
 # Specifications
-r <- 15 # camera maximum distance in meters
-theta <- 42 # camera viewshed in degrees
-a <- pi * r^2 * theta/360 # Area of a single camera in square meters
+r <- 15 # camera maximum distance in meters, if constant
+r.EDD <- runif(n_cams,min=6,max=15) #Simulate effective detection distance
+theta <- 42 # camera viewshed in degrees, if constant
+theta.EDA <- runif(n_cams,min=20, max=42) #Simulate effective detection angle
+a <- pi * r.EDD^2 * theta.EDA/360 # Area of a each camera in square meters
 A <- sa.width*sa.length # area of study area in square meters
 
 # Sector arc details
-theta_start <- (90-0.5*theta)*(pi/180) #Center all sectors at 90 degrees, convert to radians
-theta_end <- (90+0.5*theta)*(pi/180) #Center all sectors at 90 degrees, convert to radians
+theta_start <- (90-0.5*theta.EDA)*(pi/180) #Center all sectors at 90 degrees, convert to radians
+theta_end <- (90+0.5*theta.EDA)*(pi/180) #Center all sectors at 90 degrees, convert to radians
 n_points <- 100 #Number of points used to create arc
 
 
 #Create a list with parameter values for each sector
-sectors_params <- list()
+sectors_params <- lapply(1:n_cams, function(i) {
+  list(x = cameras$X[i],
+       y = cameras$Y[i],
+       r = r.EDD[i],
+       theta_start = theta_start[i],
+       theta_end = theta_end[i])
+})
 
-for (i in 1:n_cams){
-  sectors_params[[i]] <- list(x=cameras$X[i],y=cameras$Y[i], r=r, theta_start=theta_start, theta_end=theta_end)
-  
-}
 
 #Define a function to create each sector based on parameter values  
 create_sector <- function(x,y,r,theta_start,theta_end,n_points=100) {
   
+    
   #Generate arc points
   angles <- seq(theta_start, theta_end, length.out=n_points)
   arc_x <- x + r*cos(angles)
@@ -69,15 +74,13 @@ create_sector <- function(x,y,r,theta_start,theta_end,n_points=100) {
   
   #Combine points into polygon
   polygon_coords <- rbind(
-    c(x, y),
+    c(x, y), #camera position
     cbind(arc_x, arc_y),
     c(x, y)
   )
-  
-  #Create a spatial polygon
-  sector_polygon <- st_polygon(list(polygon_coords))
-  #sector_sf <- st_sfc(sector_polygon)
-  
+
+  #Return a spatial polygon
+  st_polygon(list(polygon_coords))
 }  
 
 
@@ -86,7 +89,8 @@ sectors_polygons <- lapply(sectors_params, function(params) {
   create_sector(params$x,params$y,params$r,params$theta_start,params$theta_end)
 }) 
 
-
+sectors_sf <- st_sfc(sectors_polygons)
+plot(sectors_sf)
 
 # Create capture histories ------------------------------------------------
 
