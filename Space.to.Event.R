@@ -1,3 +1,4 @@
+library(dplyr)
 
 # Define variables --------------------------------------------------------
 
@@ -34,8 +35,8 @@ data <- rep(NA,n_occ_ste)
   }
 
 
-data <- list(toevent=matrix(data*a, ncol = n_occ_ste),
-            censor=n_cams*a, 
+data <- list(toevent=matrix(data*mean(a), ncol = n_occ_ste),
+            censor=n_cams*mean(a), 
             A=A)
 
 

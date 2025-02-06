@@ -14,7 +14,7 @@ n_occ_is <- length(sampled_times)
 
 data <- captures[,sampled_times]
 
-data.list <- list(count = matrix(sample, ncol = n_occ_is),
+data.list <- list(count = matrix(data, ncol = n_occ_is),
                 ncam = n_cams,
                 nocc = n_occ_is )
 
@@ -25,9 +25,10 @@ data.list <- list(count = matrix(sample, ncol = n_occ_is),
 
 # Estimate abundance
 IS.fn <- function(data, P) {
-  Nj <- apply(data$count, 2, sum)
-  tot.ct <- sum(Nj)
-  estN <- P / (data$ncam * data$nocc) * tot.ct
+  Ni <- apply(data$count, 1, sum) #sum across all rows of data$count (counts at each location across all occasions)
+  tot <- sum(Ni/a) #summation of n/a's for each camera
+  estD <- 1/(data$ncam * data$nocc) * tot
+  estN <- estD * A
   return(estN)
 }
 
@@ -47,8 +48,9 @@ boot.fn <- function(data, nboot, P) {
   return(estN)
 }
 
-estN.boot <- boot.fn(data.list, nboot = 100, P = P)
+estN.boot <- boot.fn(data.list, nboot = 1000, P = P)
 
+mean(estN.boot)
 se_estN <- sd(estN.boot)
 se_estN
 CI_estN <- quantile(estN.boot, c(0.025, 0.975))

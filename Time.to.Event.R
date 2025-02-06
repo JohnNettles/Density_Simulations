@@ -52,7 +52,7 @@ for(b in 1:n_cams) {
 data.list <- list(toevent = matrix(data, ncol=n_occ_tte),
              censor = censor,
              A=A,
-             mean_a=a)
+             mean_a=mean(a))
 
 
 
