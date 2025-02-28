@@ -16,7 +16,7 @@ v <- 0.5 #converted to meters per minute
 t <- n_steps
 
 
-# Format data -------------------------------------------------------------
+# Get counts -------------------------------------------------------------
 
 #Create an empty results matrix
 counts <- rep(NA,n_cams)
