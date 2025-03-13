@@ -186,3 +186,30 @@ mean(jags.fit$sims.list$fit.new > jags.fit$sims.list$fit) #for each iteration, i
 # check betas
 whiskerplot(jags.fit, parameters="N", quantiles=c(0.025,0.975), zeroline=TRUE)
 
+
+
+# OccuRN ------------------------------------------------------------------
+
+library(unmarked)
+detectionUMF <- unmarkedFrameOccu(detection_binary)
+
+#Priors
+prior.list <- list(beta.normal = list(mean = rep(0, n_cams), 
+                                      var = rep(100, n_cams)),
+                   alpha.normal = list(mean = rep(0, n_bins),
+                                       var = rep(3, n_bins)), 
+                   kappa.unif = c(0, 10)) 
+# Starting values
+inits <- list(alpha = 0,
+                   beta = 0,
+                   kappa = 20, 
+                   N = apply(detection_matrix, 1, max, na.rm = TRUE))
+
+fit.RN <- occuRN(~ 1 ~ 1, data = detectionUMF, starts=c(0,0), K=200, method="BFGS", se=T, engine="R")
+
+
+summary(fit.RN)
+
+re <- unmarked::ranef(fit.RN)
+
+
