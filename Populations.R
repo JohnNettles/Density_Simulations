@@ -1,73 +1,15 @@
-set.seed(14)
-
-
-# Sample from home range --------------------------------------------------
-
-n_individ <- 10         #Population size
-n_steps <- 10000        #Number of time steps
-space_size <- 1000      #Size of 2D region
-max_speed <- 10         #Max speed in m/minute
-HR_sd_max <- 100        #Maximum home range sd
-HR_sd_min <- 20         #Minimum home range sd
-mvmt_speed <- 50        #Time it takes individual to cross the entire field of view (in minutes)
-
-
-#Uniform distribution to sample standard deviation (home range size)
-HR_sd <- runif(n_individ, HR_sd_min, HR_sd_max) 
-
-#Sample home range centers for each individual
-HR_center <- data.frame(
-  ID = 1:n_individ,
-  x = runif(n_individ, 0, space_size),
-  y = runif(n_individ, 0, space_size)
-)
-
-#Matrix to store positions over time
-locations <- array(NA, dim=c(n_individ, 2, n_steps+1))
-locations[,,1] <- as.matrix(HR_center[,c("x","y")])
-
-
-#Simulate movement
-for (t in 2:(n_steps+1)){
-  for (i in 1:n_individ){
-    
-  #For every individual, sample a random point from home range
-  proposed_x <- rnorm(1, mean=HR_center$x[i], sd=HR_sd[i])  
-  proposed_y <- rnorm(1, mean=HR_center$y[i], sd=HR_sd[i])
-  
-  #Compute distance
-  dx <- proposed_x - locations[i,1,t-1]
-  dy <- proposed_y - locations[i,2,t-1]
-  step_distance <- sqrt(dx^2 + dy^2)
-  
-  #If too far, move to max distance
-  over_limit <- step_distance > max_speed
-  dx[over_limit] <- dx[over_limit]/step_distance[over_limit]*max_speed
-  dy[over_limit] <- dy[over_limit]/step_distance[over_limit]*max_speed
-  
-  #Define new positions
-  locations[i,1,t] <- locations[i,1,t-1]+dx
-  locations[i,2,t] <- locations[i,2,t-1]+dy
-
-  #Keep within bounds
-  locations[i,1,t] <- pmax(0,pmin(space_size, locations[i,1,t]))
-  locations[i,2,t] <- pmax(0,pmin(space_size, locations[i,2,t])) 
-
-  }
-  }
-
 
 # Recursive ---------------------------------------------------------------
 
 library(circular)
 
 n_individ <- 10               #Population size
-n_steps <- 100000             #Number of time steps
+n_steps <- 10000              #Number of time steps
 space_size <- 1000            #Size of 2D region
-max_speed <- 20                #Max speed
+max_speed <- 50               #Max speed
 cor.angle <- 0.4              #Correlation between successive angles
 cor.speed <- 0.8              #Correlation between successive speeds
-acceleration_strength <- 0.2  #Strength of acceleration towards center
+acceleration_strength <- 0.4  #Strength of acceleration towards center
 mvmt_speed <- 50              #Time it takes individual to cross the entire field of view (in minutes)
 
 
@@ -130,9 +72,6 @@ angles[i] <- mean_angle
 }
 }
 
-
-
-
 # Plot results ------------------------------------------------------------
 
 library(ggplot2)
@@ -149,3 +88,61 @@ ggplot(movement_data[movement_data$ID <= 5, ], aes(x = x, y = y, color = factor(
   geom_point() +
   labs(title = "Movement of Individuals in 2D Space", x = "X Position", y = "Y Position") +
   theme_minimal()
+
+
+
+# OR - Sample from home range? --------------------------------------------------
+
+n_individ <- 10         #Population size
+n_steps <- 10000        #Number of time steps
+space_size <- 1000      #Size of 2D region
+max_speed <- 10         #Max speed in m/minute
+HR_sd_max <- 100        #Maximum home range sd
+HR_sd_min <- 20         #Minimum home range sd
+mvmt_speed <- 50        #Time it takes individual to cross the entire field of view (in minutes)
+
+
+#Uniform distribution to sample standard deviation (home range size)
+HR_sd <- runif(n_individ, HR_sd_min, HR_sd_max) 
+
+#Sample home range centers for each individual
+HR_center <- data.frame(
+  ID = 1:n_individ,
+  x = runif(n_individ, 0, space_size),
+  y = runif(n_individ, 0, space_size)
+)
+
+#Matrix to store positions over time
+locations <- array(NA, dim=c(n_individ, 2, n_steps+1))
+locations[,,1] <- as.matrix(HR_center[,c("x","y")])
+
+
+#Simulate movement
+for (t in 2:(n_steps+1)){
+  for (i in 1:n_individ){
+    
+    #For every individual, sample a random point from home range
+    proposed_x <- rnorm(1, mean=HR_center$x[i], sd=HR_sd[i])  
+    proposed_y <- rnorm(1, mean=HR_center$y[i], sd=HR_sd[i])
+    
+    #Compute distance
+    dx <- proposed_x - locations[i,1,t-1]
+    dy <- proposed_y - locations[i,2,t-1]
+    step_distance <- sqrt(dx^2 + dy^2)
+    
+    #If too far, move to max distance
+    over_limit <- step_distance > max_speed
+    dx[over_limit] <- dx[over_limit]/step_distance[over_limit]*max_speed
+    dy[over_limit] <- dy[over_limit]/step_distance[over_limit]*max_speed
+    
+    #Define new positions
+    locations[i,1,t] <- locations[i,1,t-1]+dx
+    locations[i,2,t] <- locations[i,2,t-1]+dy
+    
+    #Keep within bounds
+    locations[i,1,t] <- pmax(0,pmin(space_size, locations[i,1,t]))
+    locations[i,2,t] <- pmax(0,pmin(space_size, locations[i,2,t])) 
+    
+  }
+}
+
